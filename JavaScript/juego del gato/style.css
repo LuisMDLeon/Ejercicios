@@ -1,0 +1,13 @@
+.canvas-content {
+    background-color: black;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+  
+canvas {
+    margin: 10px;
+    stroke: white;
+    align-self: center;
+}
