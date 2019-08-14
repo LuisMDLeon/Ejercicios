@@ -16,7 +16,7 @@ class Casilla {
             y: y1 + (this.largo / 2)
         };
 
-        this.colorCombo = [255, 255];
+        this.colorCombo = [255, 255, 0];
         this.typeColours = [
             [0, 0, 255],
             [255, 0, 0]
@@ -126,7 +126,7 @@ class Tablero {
 }
 
 class Game {
-    constructor(size, p1Name = "ElTijeras", p2Name = "Jugador2") {
+    constructor(size, p1Name = "Jugador 1", p2Name = "Jugador2", runIA = false) {
         this.player1 = {
             id: 1,
             name: p1Name
@@ -150,15 +150,23 @@ class Game {
         this.turno = (Math.random(1) < 0.5) ? this.player1 : this.player2;
         this.tablero = new Tablero(size);
         this.finished = false;
+
+        this.activeIA = runIA;
+        if (runIA) this.turnOnOffIA(this.player2);
     }
 
-    click(x_pos, y_pos) {
-        if (this.finished) return false;
-        let casilla = this.tablero.click(x_pos, y_pos);
+    playGame(mouseX, mouseY) {
+        if (this.finished) return false; // Juego terminado
+
+        let casilla = -1;
+        if (this.turno.IA) casilla = this.turno.IA.play(this.tablero.state); // Movimiento de IA en base al estado del tablero
+        else if (mouseX != null && mouseY != null) casilla = this.tablero.click(mouseX, mouseY);
+
         if (casilla != -1 && this.tablero.movimiento(this.turno.id, casilla)) {
             this.applyRules();
             return true;
         }
+        return false;
     }
 
     applyRules() {
@@ -185,10 +193,29 @@ class Game {
         return false;
     }
 
-    resetGame() {
+    getStatus(state) {
+        if (this.verificarCombo(this.player2.id, state)) return this.player2.id; // Gana player1
+        else if (this.verificarCombo(this.player1.id, state)) return this.player1.id; // Gana player2
+        else if (state.filter(e => e == 0).length == 0) return 0; // Empate
+        else return -1; // Movimientos disponibles
+    }
+
+    resetGame(onOffIA) {
         this.tablero = new Tablero(this.size);
         this.turno = (Math.random(1) < 0.5) ? this.player1 : this.player2;
         this.finished = false;
+
+        if (onOffIA) this.turnOnOffIA(this.player2);
+    }
+
+    turnOnOffIA(player) {
+        if (player.IA) {
+            player.IA = null;
+            this.activeIA = false;
+        } else if (!player.IA) {
+            player.IA = new IA(this.player2.id, this.player2.name, this.player1.id, this);
+            this.activeIA = true;
+        }
     }
 
     showTablero() {
@@ -228,5 +255,10 @@ class Game {
         fill(255, 255, 0);
         textSize(15);
         text(turn, 0, this.size - 20);
+
+        const txia = this.activeIA ? "IA ACTIVA" : "....";
+        const txial = textWidth(txia);
+
+        text(txia, this.size - txial, this.size - 20);
     }
 }
