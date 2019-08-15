@@ -1,8 +1,7 @@
 # -*- coding: latin-1 -*-
 """ 
 	Analizador Léxico v1.0.0
-	Autor : Luis Ángel Méndez de León
-	Fecha : Abril de 2017
+	Autor : Luis M. de León
 """
 from __future__ import print_function
 import sys
@@ -93,7 +92,7 @@ def analizadorV1(cadena):
 		if (cadena[indice] == ' ' and token == '') or cadena[indice] != ' ':  # extraer token, excluyendo delimitador
 			token += cadena[indice]
 		
-		if estado >= 100 or estado < 0:									# >=100 token aceptado, <0 token invalido
+		if estado >= 100 or estado < 0:	# >=100 token aceptado, <0 token invalido
 			resultado(estado, token)
 			token = ''
 			if estado < 0:
