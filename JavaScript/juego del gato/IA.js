@@ -55,11 +55,15 @@ class IA {
     min(evals) {
         let min = Infinity;
         let move = null;
+        let c_prob = 1 / evals.length;
+
         for (let i = 0; i < evals.length; i++) {
             if (evals[i].eval < min) {
                 min = evals[i].eval;
                 move = evals[i];
-            } // Añadir cambio de movimiento por uno equivalente
+            } else if (evals[i].eval == min && Math.random() < c_prob) {
+                move = evals[i];
+            }
         }
         return move;
     }
@@ -68,11 +72,15 @@ class IA {
     max(evals) {
         let max = -Infinity;
         let move = null;
+        let c_prob = 1 / evals.length;
+
         for (let i = 0; i < evals.length; i++) {
             if (evals[i].eval > max) {
                 max = evals[i].eval;
                 move = evals[i];
-            } // Añadir cambio de movimiento por uno equivalente
+            } else if (evals[i].eval == max && Math.random() < c_prob) {
+                move = evals[i];
+            }
         }
         return move;
     }
