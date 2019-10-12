@@ -46,12 +46,12 @@ class IA {
                 i: moves[i].i
             }
         }
-        // Retorna el movimiento con la evavluación más alta o más baja
+        // Retorna el movimiento con la evaluación más alta o más baja
         // dependiendo del turno, favoreciendo a la IA para maximizar
         return (turn == this.id) ? this.max(evals) : this.min(evals);;
     }
 
-    // Filtra un conjunto de evaluaciones, retornando la jugado con menor valor
+    // Filtra un conjunto de evaluaciones, retornando la jugada con menor valor
     min(evals) {
         let min = Infinity;
         let move = null;
@@ -68,7 +68,7 @@ class IA {
         return move;
     }
 
-    // Filtra un conjunto de evaluaciones, retornando la jugado con mayor valor
+    // Filtra un conjunto de evaluaciones, retornando la jugada con mayor valor
     max(evals) {
         let max = -Infinity;
         let move = null;
