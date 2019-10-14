@@ -20,8 +20,8 @@ const MEDIUM_ASTEROID = {
 };
 const TINY_ASTEROID = {
     radius: {
-        min: 20,
-        max: 25
+        min: 10,
+        max: 15
     },
     veritices: {
         min: 5,
@@ -64,16 +64,18 @@ function Asteroid(vertices, type, radius, center) {
     this.bounds = (x_range, y_range) => {
         let dc = [0, 0];
 
-        if (this.center[0] + this.radius < x_range[0]) {
-            dc[0] = x_range[1] + this.radius + (x_range[0] - this.center[0]);
-        } else if (this.center[0] - this.radius > x_range[1]) {
-            dc[0] -= ((this.center[0] - x_range[0]) + this.radius);
+
+        if (this.center[0] + this.radius <= x_range[0]) {
+            //dc[0] = x_range[1] + this.radius - Math.abs(this.center[0]);
+            dc[0] = (x_range[1] + this.radius) - this.center[0];
+        } else if (this.center[0] - this.radius >= x_range[1]) {
+            dc[0] = -(this.center[0] - (x_range[0] - this.radius));
         }
 
-        if (this.center[1] + this.radius < y_range[0]) {
-            dc[1] = y_range[1] + this.radius + (y_range[0] - this.center[1]);
-        } else if (this.center[1] - this.radius > y_range[1]) {
-            dc[1] -= ((this.center[1] - y_range[0]) + this.radius);
+        if (this.center[1] + this.radius <= y_range[0]) {
+            dc[1] = (y_range[1] + this.radius) - this.center[1];
+        } else if (this.center[1] - this.radius >= y_range[1]) {
+            dc[1] = -(this.center[1] - (y_range[0] - this.radius));
         }
 
         if (dc[0] != 0 || dc[1] != 0) this.update(dc);
@@ -92,7 +94,7 @@ function Asteroid(vertices, type, radius, center) {
         const b = this.vertices[length - 1];
 
         line(a[0], a[1], b[0], b[1]);
-        //circle(this.center[0], this.center[1], this.radius * 2);
+        circle(this.center[0], this.center[1], this.radius * 2);
     }
 }
 
