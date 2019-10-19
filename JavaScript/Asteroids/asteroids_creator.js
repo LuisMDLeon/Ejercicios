@@ -1,84 +1,83 @@
 const BIG_ASTEROID = {
     radius: {
         min: 75,
-        max: 100
+        max: 85
     },
     veritices: {
         min: 6,
         max: 12
+    },
+    vel: {
+        min: 0.3,
+        max: 1.1
     }
 };
 const MEDIUM_ASTEROID = {
     radius: {
-        min: 35,
+        min: 40,
         max: 50
     },
     veritices: {
         min: 5,
         max: 8
+    },
+    vel: {
+        min: 0.5,
+        max: 1.3
     }
 };
 const TINY_ASTEROID = {
     radius: {
-        min: 10,
-        max: 15
+        min: 14,
+        max: 17
     },
     veritices: {
         min: 5,
         max: 6
+    },
+    vel: {
+        min: 1,
+        max: 2
     }
 };
 
-function random2DVector(min_lenght, max_lenght) {
-    const length = min_lenght + Math.random() * (max_lenght - min_lenght);
-    const angle = Math.random() * (Math.PI * 2);
-
-    const x = length * Math.cos(angle);
-    const y = length * Math.sin(angle);
-
-    return [x, y];
-}
-
-function Asteroid(vertices, type, radius, center) {
+function Asteroid(vertices, type, radius, x, y) {
     this.vertices = vertices;
     this.type = type;
     this.radius = radius;
-    this.center = center;
-    this.velocity = random2DVector(1, 2.5);
-    //this.drag = 0.2;
+    this.center = new Vector2D(x, y);
+    this.velocity = SVectorRandom(type.vel.min, type.vel.max);
 
     // Actualiza la posición del polígono en base al vector de velocidad u otro parámetro
     this.update = (delta = this.velocity) => {
         for (let i = 0; i < this.vertices.length; i++) {
             // Aplicación de velocidad a la posición (cada vértice)
-            this.vertices[i][0] += delta[0];
-            this.vertices[i][1] += delta[1];
+            this.vertices[i][0] += delta.x;
+            this.vertices[i][1] += delta.y;
         }
         // Reposicionamiento del centro
-        this.center[0] += delta[0];
-        this.center[1] += delta[1];
+        this.center.add(delta.x, delta.y);
     }
 
     // Controla la posición de cada polígono de manera que no sobrepasen un area definida
     // invierte su posición al lado opuesto
     this.bounds = (x_range, y_range) => {
-        let dc = [0, 0];
+        let dx = 0;
+        let dy = 0;
 
-
-        if (this.center[0] + this.radius <= x_range[0]) {
-            //dc[0] = x_range[1] + this.radius - Math.abs(this.center[0]);
-            dc[0] = (x_range[1] + this.radius) - this.center[0];
-        } else if (this.center[0] - this.radius >= x_range[1]) {
-            dc[0] = -(this.center[0] - (x_range[0] - this.radius));
+        if (this.center.x + this.radius <= x_range[0]) {
+            dx = (x_range[1] + this.radius) - this.center.x;
+        } else if (this.center.x - this.radius >= x_range[1]) {
+            dx = -(this.center.x - (x_range[0] - this.radius));
         }
 
-        if (this.center[1] + this.radius <= y_range[0]) {
-            dc[1] = (y_range[1] + this.radius) - this.center[1];
-        } else if (this.center[1] - this.radius >= y_range[1]) {
-            dc[1] = -(this.center[1] - (y_range[0] - this.radius));
+        if (this.center.y + this.radius <= y_range[0]) {
+            dy = (y_range[1] + this.radius) - this.center.y;
+        } else if (this.center.y - this.radius >= y_range[1]) {
+            dy = -(this.center.y - (y_range[0] - this.radius));
         }
 
-        if (dc[0] != 0 || dc[1] != 0) this.update(dc);
+        if (dx != 0 || dy != 0) this.update(new Vector2D(dx, dy));
     }
 
     this.render = () => {
@@ -94,7 +93,6 @@ function Asteroid(vertices, type, radius, center) {
         const b = this.vertices[length - 1];
 
         line(a[0], a[1], b[0], b[1]);
-        circle(this.center[0], this.center[1], this.radius * 2);
     }
 }
 
@@ -106,7 +104,9 @@ function AsteroidsCreator() {
         const margin = angle_size / (vertices + 1);
 
         // Para cada vertice se calcula el rango del angulo y una distancia del centro (x, y)
+        // max define el radio más grande generado entre todos los vertices
         let polygon = [];
+        let max = -Infinity;
         for (let i = 0; i < vertices; i++) {
             const a1 = (angle_size * i) + margin;
             const a2 = (angle_size * (i + 1)) - margin;
@@ -121,9 +121,11 @@ function AsteroidsCreator() {
             const vy = distance * Math.sin(angle) + y;
 
             polygon[i] = [vx, vy];
+
+            if (max < rmax) max = rmax;
         }
 
-        return new Asteroid(polygon, type, radius, [x, y]);
+        return new Asteroid(polygon, type, max, x, y);
     }
 
     // Genera una lista de polígonos con radio y número de vertices aleatorios dentro de un rango
