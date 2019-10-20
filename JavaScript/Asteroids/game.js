@@ -3,7 +3,7 @@ const RIGHT_DIR = 37;
 
 class AsteroidsGameREDUX {
     constructor(x_range, y_range) {
-        this.INIT_N_ASTEROIDS = 5;
+        this.INIT_N_ASTEROIDS = 7;
         this.CREATOR = new AsteroidsCreator();
         this.x_range = x_range;
         this.y_range = y_range;
@@ -17,6 +17,8 @@ class AsteroidsGameREDUX {
         this.bullets = [];
 
         this.playing = true;
+
+        this.score = 0;
     }
 
     rotatePlayer(direction) {
@@ -29,6 +31,7 @@ class AsteroidsGameREDUX {
     }
 
     shotBullet() {
+        shot.play();
         this.bullets.push(this.player.shot());
     }
 
@@ -43,6 +46,10 @@ class AsteroidsGameREDUX {
                 const dist = distance(asteroid.center.array(), bullet.arrayDirection());
                 if (dist < asteroid.radius) {
                     destroy = true;
+                    this.score += asteroid.type.mana;
+
+                    explosion.play();
+
                     this.asteroids.splice(i, 1);
                     this.bullets.splice(j, 1);
                     if (asteroid.type != TINY_ASTEROID)
@@ -55,7 +62,10 @@ class AsteroidsGameREDUX {
                 const dist = distance(this.player.position.array(), asteroid.center.array());
                 this.playing = !(dist < (this.player.radius / 2) + (asteroid.radius * 0.7));
                 //console.log("Juego terminado");
-                if (!this.playing) return;
+                if (!this.playing) {
+                    p_explosion.play();
+                    return;
+                }
             }
         }
         this.asteroids = this.asteroids.concat(new_asteroids);
@@ -73,12 +83,27 @@ class AsteroidsGameREDUX {
         }
     }
 
+    showScore() {
+        const textP = "PUNTUACION : [" + this.score + "]";
+        textSize(18);
+        const margin = 20;
+        const xt = this.x_range[0] + margin;
+        const yt = this.y_range[0] + margin * 2;
+
+        text(textP, xt, yt);
+    }
+
     render() {
         if (!this.playing) return;
 
         background(0);
         stroke(255);
         strokeWeight(1);
+
+        fill(255);
+        this.showScore();
+        noFill();
+
         for (let i = 0; i < this.asteroids.length; i++) {
             const asteroid = this.asteroids[i];
             asteroid.render();

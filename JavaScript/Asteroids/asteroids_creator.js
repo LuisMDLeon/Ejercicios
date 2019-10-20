@@ -10,7 +10,8 @@ const BIG_ASTEROID = {
     vel: {
         min: 0.3,
         max: 1.1
-    }
+    },
+    mana: 50
 };
 const MEDIUM_ASTEROID = {
     radius: {
@@ -24,7 +25,8 @@ const MEDIUM_ASTEROID = {
     vel: {
         min: 0.5,
         max: 1.3
-    }
+    },
+    mana: 100
 };
 const TINY_ASTEROID = {
     radius: {
@@ -36,9 +38,10 @@ const TINY_ASTEROID = {
         max: 6
     },
     vel: {
-        min: 1,
-        max: 2
-    }
+        min: 1.3,
+        max: 2.5
+    },
+    mana: 300
 };
 
 function Asteroid(vertices, type, radius, x, y) {

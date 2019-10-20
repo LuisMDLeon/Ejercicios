@@ -13,6 +13,8 @@ class Player {
         this.speedUpForce = 0.15;
         this.max_vel = 3;
 
+        this.shot_force = 0.15;
+
         // Cálculo de la cabecera
         this.head = new Vector2D(this.position.x, this.position.y - this.radius);
 
@@ -120,6 +122,11 @@ class Player {
     shot() {
         let o = this.head.copy();
         o.substract(this.position.x, this.position.y);
+
+        let hc = this.head.copy();
+        hc.substract(this.position.x, this.position.y);
+        this.velocity = SubSVectors(this.velocity, SVectorFromPolarC(hc.heading(), this.shot_force));
+
         return new Bullet(this.head.x, this.head.y, o);
     }
 
