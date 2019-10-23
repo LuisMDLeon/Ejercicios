@@ -4,6 +4,8 @@ class Player {
         this.ANGLE_R = 0.10471975511965978;
 
         this.position = new Vector2D(x_spaw, y_spaw);
+        this.x_spaw = x_spaw;
+        this.y_spaw = y_spaw;
         this.radius = 8;
 
         this.drag = 0.991;
@@ -26,6 +28,36 @@ class Player {
         // Calculo de puntos adyacentes (alerones)
         this.l1 = new Vector2D(dx + this.position.x, dy + this.position.y);
         this.l2 = new Vector2D(this.position.x - dx, dy + this.position.y);
+
+        // Estados
+        this.alive = true;
+        this.lives = 1;
+    }
+
+    reborn() {
+        if (!this.alive && (this.lives > 0)) {
+            this.lives -= 1;
+            this.position = new Vector2D(this.x_spaw, this.y_spaw);
+            this.aceleration = new Vector2D();
+            this.velocity = new Vector2D();
+
+            // Cálculo de la cabecera
+            this.head = new Vector2D(this.position.x, this.position.y - this.radius);
+
+            // Desplazamiento con longitud r a  45 grados
+            const angle = Math.PI / 4;
+            const dx = this.radius * Math.cos(angle);
+            const dy = this.radius * Math.sin(angle);
+
+            // Calculo de puntos adyacentes (alerones)
+            this.l1 = new Vector2D(dx + this.position.x, dy + this.position.y);
+            this.l2 = new Vector2D(this.position.x - dx, dy + this.position.y);
+
+            this.alive = true;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     speedUp() {
@@ -144,7 +176,7 @@ class Bullet {
         this.oy = oy;
         this.direction = direction;
         this.velocity = SVectorFromPolarC(direction.heading(), 5);
-        this.range = 500;
+        this.range = 250;
     }
 
     update() {

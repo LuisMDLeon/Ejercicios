@@ -6,6 +6,9 @@ const y_range = [0, H];
 let shot = null;
 let explosion = null;
 let c_font = null;
+let p_explosion = null;
+let p_explosion_img = null;
+let live_img = null;
 
 let game = new AsteroidsGameREDUX(x_range, y_range);
 
@@ -15,14 +18,19 @@ function preload() {
     p_explosion = loadSound('/res/player-explosion.wav');
 
     c_font = loadFont('/res/PixelOperator8.ttf');
+
+    p_explosion_img = loadImage('/res/player-explosion-2.png');
+    live_img = loadImage('/res/live.png');
 }
 
 function setup() {
     const canvas = createCanvas(W, H);
     canvas.parent('sketch');
+    imageMode(CENTER);
 
     shot.setVolume(0.5);
-    explosion.setVolume(0.35);
+    explosion.setVolume(0.3);
+    p_explosion.setVolume(0.3);
 
     textFont(c_font);
 }

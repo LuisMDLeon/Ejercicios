@@ -16,21 +16,28 @@ class AsteroidsGameREDUX {
         this.player = new Player(this.cx, this.cy);
         this.bullets = [];
 
-        this.playing = true;
-
         this.score = 0;
+
+        this.ex_time = 30;
+        this.ex_in_time = 0;
+        this.explosion = false;
+
+        this.animate = true;
     }
 
     rotatePlayer(direction) {
+        if (!this.player.alive) return;
         if (direction == RIGHT_DIR || direction == LEFT_DIR)
             this.player.rotate2(direction);
     }
 
     throttlePlayer() {
+        if (!this.player.alive) return;
         this.player.speedUp();
     }
 
     shotBullet() {
+        if (!this.player.alive) return;
         shot.play();
         this.bullets.push(this.player.shot());
     }
@@ -58,11 +65,12 @@ class AsteroidsGameREDUX {
                 }
             }
 
-            if (!destroy) {
+            if (!destroy && this.player.alive) {
                 const dist = distance(this.player.position.array(), asteroid.center.array());
-                this.playing = !(dist < (this.player.radius / 2) + (asteroid.radius * 0.7));
+                this.player.alive = !(dist < (this.player.radius / 2) + (asteroid.radius * 0.7));
+                this.explosion = true;
                 //console.log("Juego terminado");
-                if (!this.playing) {
+                if (!this.player.alive) {
                     p_explosion.play();
                     return;
                 }
@@ -84,18 +92,37 @@ class AsteroidsGameREDUX {
     }
 
     showScore() {
-        const textP = "PUNTUACION : [" + this.score + "]";
+        const textP = "SCORE : [" + this.score + "]";
+        const textL = " x " + this.player.lives;
+
         textSize(18);
+
         const margin = 20;
         const xt = this.x_range[0] + margin;
         const yt = this.y_range[0] + margin * 2;
 
         text(textP, xt, yt);
+
+        const w = textWidth(textL);
+        const xl = this.x_range[1] - w - 20;
+
+        text(textL, xl, yt);
+        image(live_img, xl - 10, yt - 8, 25, 25);
+    }
+
+    showGO() {
+        if (!this.animate) {
+            const textG = "GAME OVER";
+
+            textSize(60);
+            const wg = textWidth(textG);
+
+            text(textG, (W - wg) / 2, (H / 2) - 30);
+        }
     }
 
     render() {
-        if (!this.playing) return;
-
+        if (!this.animate) return;
         background(0);
         stroke(255);
         strokeWeight(1);
@@ -114,9 +141,28 @@ class AsteroidsGameREDUX {
         strokeWeight(2);
         stroke(240, 0, 80);
 
-        this.player.render();
-        this.player.update();
-        this.player.bounds(this.x_range, this.y_range);
+        if (!this.player.alive) {
+            if (this.explosion) {
+                image(p_explosion_img, this.player.position.x, this.player.position.y, this.player.radius * 4, this.player.radius * 4);
+                this.ex_in_time += 1;
+                if (this.ex_in_time == this.ex_time) {
+                    this.ex_in_time = 0;
+                    this.explosion = false;
+                }
+            } else {
+                if (!this.player.reborn()) {
+                    // GAME OVER
+                    console.log("GAME OVER", this.player);
+                    this.animate = false;
+                    this.showGO();
+                    return;
+                }
+            }
+        } else {
+            this.player.render();
+            this.player.update();
+            this.player.bounds(this.x_range, this.y_range);
+        }
 
         for (let i = this.bullets.length - 1; i >= 0; i--) {
             if (this.bullets[i].bounds()) {
