@@ -31,7 +31,7 @@ class Player {
 
         // Estados
         this.alive = true;
-        this.lives = 1;
+        this.lives = 4;
     }
 
     reborn() {

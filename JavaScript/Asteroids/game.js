@@ -3,7 +3,7 @@ const RIGHT_DIR = 37;
 
 class AsteroidsGameREDUX {
     constructor(x_range, y_range) {
-        this.INIT_N_ASTEROIDS = 7;
+        this.INIT_N_ASTEROIDS = 6;
         this.CREATOR = new AsteroidsCreator();
         this.x_range = x_range;
         this.y_range = y_range;
@@ -18,6 +18,8 @@ class AsteroidsGameREDUX {
 
         this.score = 0;
 
+        this.limbo_time = 300;
+        this.limbo = 0;
         this.ex_time = 30;
         this.ex_in_time = 0;
         this.explosion = false;
@@ -42,6 +44,7 @@ class AsteroidsGameREDUX {
         this.bullets.push(this.player.shot());
     }
 
+    // Verificar colisión BALA-ASTEROIDE
     checkCollider() {
         let new_asteroids = [];
         for (let i = this.asteroids.length - 1; i >= 0; i--) {
@@ -50,8 +53,8 @@ class AsteroidsGameREDUX {
             for (let j = this.bullets.length - 1; j >= 0; j--) {
                 const bullet = this.bullets[j];
                 // Check by radius (distance)
-                const dist = distance(asteroid.center.array(), bullet.arrayDirection());
-                if (dist < asteroid.radius) {
+                //const dist = distance(asteroid.center.array(), bullet.arrayDirection());
+                if (collidePointPolygon(bullet.arrayDirection(), asteroid.vertices)) {
                     destroy = true;
                     this.score += asteroid.type.mana;
 
@@ -63,6 +66,14 @@ class AsteroidsGameREDUX {
                         new_asteroids = new_asteroids.concat(this.destroyAsteroid(asteroid));
                     break;
                 }
+            }
+
+
+            if (this.limbo > 0 && this.limbo <= this.limbo_time) {
+                this.limbo += 1;
+                break;
+            } else {
+                this.limbo = 0;
             }
 
             if (!destroy && this.player.alive) {
@@ -156,6 +167,8 @@ class AsteroidsGameREDUX {
                     this.animate = false;
                     this.showGO();
                     return;
+                } else {
+                    this.limbo += 1;
                 }
             }
         } else {
@@ -175,4 +188,29 @@ class AsteroidsGameREDUX {
 
         this.checkCollider();
     };
+}
+
+// Colisión de polígono con punto, tomada de p5.collide2d
+function collidePointPolygon(point, vertices) {
+    let collision = false;
+
+    // go through each of the vertices, plus the next vertex in the list
+    let next = 0;
+    for (let current = 0; current < vertices.length; current++) {
+
+        // get next vertex in list if we've hit the end, wrap around to 0
+        next = current + 1;
+        if (next == vertices.length) next = 0;
+
+        // get the PVectors at our current position this makes our if statement a little cleaner
+        const vc = vertices[current]; // c for "current"
+        const vn = vertices[next]; // n for "next"
+
+        // compare position, flip 'collision' variable back and forth
+        if (((vc[1] > point[1] && vn[1] < point[1]) || (vc[1] < point[1] && vn[1] > point[1])) &&
+            (point[0] < (vn[0] - vc[0]) * (point[1] - vc[1]) / (vn[1] - vc[1]) + vc[0])) {
+            collision = !collision;
+        }
+    }
+    return collision;
 }
