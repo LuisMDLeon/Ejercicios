@@ -5,6 +5,7 @@ const length = 10;
 const c_point = new Point(270, 850);
 
 let i = 2;
+let max = 0;
 
 function setup() {
     createCanvas(800, 900);
@@ -45,8 +46,10 @@ function renderList(list) {
     let last_p = new Point(c_point.x, c_point.y);
     let l = length;
 
-    let dis = 0.037;
+    let dis = 0.055;
     let j = 1;
+
+    if (list.length > max) max = list.length;
 
     for (let i = list.length - 1; i >= 0; i--) {
         const n = list[i];
