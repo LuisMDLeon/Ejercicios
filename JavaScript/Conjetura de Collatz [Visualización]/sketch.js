@@ -2,22 +2,23 @@ const limit = 10000;
 const angle = 0.14;
 const length = 10;
 
-let c_point = new Point(200, 850);
+const c_point = new Point(200, 850);
+
+let i = 2;
 
 function setup() {
-    createCanvas(800, 900);
+    createCanvas(800, 900, P2D);
     colorMode(HSB, 1, 1, 1, 1);
+    background(0);
+    smooth();
 }
 
 function draw() {
-    background(0);
-    strokeWeight(2);
-    smooth();
-
-    for (let i = 1; i < limit; i++) {
+    for (let j = 0; j < 3 && i < limit; j++) {
         renderList(collatzList(i));
+        i += 1;
     }
-    noLoop();
+    if (i == limit) noLoop();
 }
 
 function collatzNumber(number) {
@@ -49,7 +50,7 @@ function renderList(list) {
     let dis = 0.037;
     let j = 1;
 
-    for (let i = list.length - 2; i >= 0; i--) {
+    for (let i = list.length - 1; i >= 0; i--) {
         const n = list[i];
         r_angle += (n % 2 == 0) ? 0.27 - (0.0002 * j) : -0.19 + (0.00025 * j);
         l -= dis;
